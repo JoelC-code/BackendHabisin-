@@ -4,6 +4,7 @@ import express from "express";
 import authRoutes       from "./routes/auth-routes";
 import categoryRoutes   from "./routes/category-routes";
 import foodRoutes       from "./routes/food-routes";
+import DashboardRoutes  from "./routes/dashboard-routes";
 
 const app  = express();
 const PORT = process.env.PORT ?? 3000;
@@ -16,6 +17,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use("/api/auth",        authRoutes);
 app.use("/api/categories",  categoryRoutes);
 app.use("/api/foods",       foodRoutes);
+app.use("/api/dashboard",   DashboardRoutes);
 
 // ─── Health check ─────────────────────────────────────────
 app.get("/health", (_req, res) => {
