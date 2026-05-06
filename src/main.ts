@@ -5,6 +5,7 @@ import authRoutes       from "./routes/auth-routes";
 import categoryRoutes   from "./routes/category-routes";
 import foodRoutes       from "./routes/food-routes";
 import DashboardRoutes  from "./routes/dashboard-routes";
+import resepRoutes      from "./routes/resep-routes";
 
 const app  = express();
 const PORT = process.env.PORT ?? 3000;
@@ -18,6 +19,7 @@ app.use("/api/auth",        authRoutes);
 app.use("/api/categories",  categoryRoutes);
 app.use("/api/foods",       foodRoutes);
 app.use("/api/dashboard",   DashboardRoutes);
+app.use("/api/resep",       resepRoutes);
 
 // ─── Health check ─────────────────────────────────────────
 app.get("/health", (_req, res) => {

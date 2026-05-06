@@ -24,6 +24,8 @@ model User {
   subscription Subscription?
 
   food Food[]
+
+  resep Resep[]
 }
 
 model Subscription {
@@ -52,6 +54,9 @@ model Resep {
   resepDescription String @db.VarChar(255)
   resepIngredients String[]
   resepDirections String[]
+
+  user_id Int 
+  user User @relation(fields: [user_id], references: [id], onDelete: Cascade)
 }
 
 enum FoodCategory {
