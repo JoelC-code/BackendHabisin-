@@ -1,27 +1,31 @@
-import { Request, Response, NextFunction } from "express";
-import jwt from "jsonwebtoken";
-import { unauthorized } from "../utils/response";
-import { UserJWTPayload } from "../models/user-model";
-import { UserRequest } from "../models/user-request-model";
+import { NextFunction, Response } from "express"
+import { UserRequest } from "../models/user-request-model"
+import { ResponseError } from "../errors/response-error"
+import { verifyToken } from "../utils/jwt-util"
 
 export const authenticate = (
     req: UserRequest,
     res: Response,
     next: NextFunction
-): void => {
-    const header = req.headers.authorization;
-    if (!header?.startsWith("Bearer ")) {
-        unauthorized(res, "No token provided");
-        return;
-    }
+) => {
     try {
-        const payload = jwt.verify(
-            header.split(" ")[1],
-            process.env.JWT_SECRET as string
-        ) as UserJWTPayload;
-        req.user = payload;
-        next();
-    } catch {
-        unauthorized(res, "Invalid or expired token");
+        const authHeader = req.headers["authorization"]
+        const token = authHeader && authHeader.split(" ")[1]
+
+        if (!token) {
+            next(new ResponseError(401, "Unauthorized user!"))
+        }
+
+        const payload = verifyToken(token!)
+
+        if (payload) {
+            req.user = payload
+        } else {
+            next(new ResponseError(401, "Unauthorized user!"))
+        }
+
+        next()
+    } catch (error) {
+        next(error)
     }
-};
+}

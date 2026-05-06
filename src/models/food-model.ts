@@ -1,5 +1,5 @@
 import { Food } from "../../generated/prisma/client";
-import { FoodCategory } from "../../generated/prisma/enums";
+import { FoodCategory } from "../../generated/prisma/client";
 
 // ─── REQUEST DTO ──────────────────────────────────────────
 export interface FoodCreateUpdateRequest {
