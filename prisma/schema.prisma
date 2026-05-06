@@ -10,6 +10,8 @@ generator client {
 
 datasource db {
   provider = "postgresql"
+  //! ignore error ini, hapus ngak bisa migrate
+  //! cuman warning ae, ngak ngerusak DB
   url      = env("DATABASE_URL")
 }
 
