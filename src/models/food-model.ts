@@ -1,5 +1,4 @@
-import { Food } from "../../generated/prisma/client";
-import { FoodCategory } from "../../generated/prisma/client";
+import { Food, FoodCategory } from "../../generated/prisma/client";
 
 // ─── REQUEST DTO ──────────────────────────────────────────
 export interface FoodCreateUpdateRequest {
