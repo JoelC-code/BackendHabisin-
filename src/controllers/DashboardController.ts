@@ -5,9 +5,8 @@ import { DashboardService } from "../services/dashboard-service";
 export class DashboardController {
     static async getDashboard(req: UserRequest, res: Response, next: NextFunction) {
         try {
-            const user = req.user!
-
-            const result = await DashboardService.getDashboard(user.id)
+            console.log("REQ.USER:", req.user);
+            const result = await DashboardService.getDashboard(req.user!)
             res.json({
                 data: result
             });
