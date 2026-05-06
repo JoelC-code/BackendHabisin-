@@ -1,0 +1,34 @@
+import "dotenv/config";
+import express from "express";
+
+import authRoutes       from "./routes/auth-routes";
+import categoryRoutes   from "./routes/category-routes";
+import foodRoutes       from "./routes/food-routes";
+
+const app  = express();
+const PORT = process.env.PORT ?? 3000;
+
+// ─── Global middleware ────────────────────────────────────
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+// ─── Routes ──────────────────────────────────────────────
+app.use("/api/auth",        authRoutes);
+app.use("/api/categories",  categoryRoutes);
+app.use("/api/foods",       foodRoutes);
+
+// ─── Health check ─────────────────────────────────────────
+app.get("/health", (_req, res) => {
+  res.json({ status: "ok", timestamp: new Date().toISOString() });
+});
+
+// ─── 404 catch-all ────────────────────────────────────────
+app.use((_req, res) => {
+  res.status(404).json({ success: false, message: "Route not found" });
+});
+
+app.listen(PORT, () => {
+  console.log(`Server running on http://localhost:${PORT}`);
+});
+
+export default app;
