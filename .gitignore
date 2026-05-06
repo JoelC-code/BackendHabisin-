@@ -5,3 +5,6 @@ node_modules
 /generated/prisma
 
 /generated/prisma
+.DS_Store
+/uploads
+.vscode
