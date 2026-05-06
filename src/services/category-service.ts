@@ -1,4 +1,4 @@
-import { FoodCategory } from "../../generated/prisma/enums";
+import { FoodCategory } from "../../generated/prisma/client";
 
 export const categoryService = {
     getAllCategories(): string[] {
