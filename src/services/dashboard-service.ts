@@ -13,6 +13,7 @@ export class DashboardService {
             where: {
                 user_id: userId,
                 bestBefore: {
+                    gte: now,
                     lte: thresholdDate
                 }
             },
