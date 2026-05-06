@@ -1,6 +1,6 @@
 import { prismaClient } from "../utils/prisma";
 import { UserJWTPayload } from "../models/user-model";
-import { FoodCategory } from "../../generated/prisma/enums";
+
 import {
     FoodCreateUpdateRequest,
     FoodResponse,

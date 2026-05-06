@@ -1,4 +1,4 @@
-import { Food } from "../../generated/prisma";
+import { Food } from "../../generated/prisma/client";
 import { FoodCategory } from "../../generated/prisma/enums";
 
 // ─── REQUEST DTO ──────────────────────────────────────────
