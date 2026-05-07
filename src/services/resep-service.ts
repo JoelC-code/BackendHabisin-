@@ -1,5 +1,5 @@
 // services/resep-service.ts
-import { PrismaClient } from "../../generated/prisma/client";
+import { prismaClient } from "../utils/prisma";
 import { toFoodResponseList } from "../models/food-model";
 import {
   ResepGenerateResponse,
@@ -9,14 +9,13 @@ import {
 } from "../models/resep-model";
 import { generateRecipeFromAI } from "../utils/gemini-utils";
 
-const prisma = new PrismaClient();
 
 // ─── GENERATE RESEP ───────────────────────────────────────
 export const generateResep = async (
   userId: number,
   saveToHistory: boolean
 ): Promise<ResepGenerateResponse> => {
-  const rawFoods = await prisma.food.findMany({
+  const rawFoods = await prismaClient.food.findMany({
     where: {
       user_id: userId,
       quantity: { gt: 0 },
@@ -37,7 +36,7 @@ export const generateResep = async (
 
   let saved: ResepResponse | undefined;
   if (saveToHistory) {
-    const created = await prisma.resep.create({
+    const created = await prismaClient.resep.create({
       data: {
         resepName: parsed.resepName,
         resepDescription: parsed.resepDescription,
@@ -54,7 +53,7 @@ export const generateResep = async (
 
 // ─── GET ALL RESEP (Hanya milik user) ─────────────────────
 export const getAllResep = async (userId: number): Promise<ResepResponse[]> => {
-  const reseps = await prisma.resep.findMany({
+  const reseps = await prismaClient.resep.findMany({
     where: { user_id: userId }, // ✅ Filter by user_id
     orderBy: { id: "desc" },
   });
@@ -63,7 +62,7 @@ export const getAllResep = async (userId: number): Promise<ResepResponse[]> => {
 
 // ─── GET RESEP BY ID (Hanya milik user) ───────────────────
 export const getResepById = async (userId: number, id: number): Promise<ResepResponse> => {
-  const resep = await prisma.resep.findFirst({ 
+  const resep = await prismaClient.resep.findFirst({ 
     where: { id, user_id: userId } // ✅ Pastikan id & user_id cocok
   });
   
@@ -74,11 +73,11 @@ export const getResepById = async (userId: number, id: number): Promise<ResepRes
 // ─── DELETE RESEP (Hanya milik user) ──────────────────────
 export const deleteResep = async (userId: number, id: number): Promise<void> => {
   // Cek dulu apakah resep ini benar milik dia
-  const resep = await prisma.resep.findFirst({ 
+  const resep = await prismaClient.resep.findFirst({ 
     where: { id, user_id: userId } 
   });
   
   if (!resep) throw new Error("Resep tidak ditemukan atau Anda tidak memiliki akses untuk menghapusnya");
   
-  await prisma.resep.delete({ where: { id } });
+  await prismaClient.resep.delete({ where: { id } });
 };
