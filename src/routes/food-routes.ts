@@ -4,8 +4,8 @@ import { authenticate } from "../middleware/auth";
 
 const router = Router();
 
-router.get("/all",FoodController.getAll);
-router.get("/:id", FoodController.getById);
+router.get("/all", authenticate, FoodController.getAll);
+router.get("/:id", authenticate, FoodController.getById);
 router.post("/create", authenticate, FoodController.create);
 router.delete("/remove/:id", authenticate, FoodController.remove);
 
