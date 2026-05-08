@@ -33,7 +33,6 @@ export class DashboardService {
 
         if (totalItems === 0) {
             return {
-                message: "No Food yet",
                 expiringFoods: [],
                 totalItems: 0,
                 expiringTotal: 0

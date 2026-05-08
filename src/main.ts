@@ -6,6 +6,7 @@ import categoryRoutes   from "./routes/category-routes";
 import foodRoutes       from "./routes/food-routes";
 import DashboardRoutes  from "./routes/dashboard-routes";
 import resepRoutes      from "./routes/resep-routes";
+import { ResponseError } from "./errors/response-error";
 
 const app  = express();
 const PORT = process.env.PORT ?? 3000;
@@ -29,6 +30,15 @@ app.get("/health", (_req, res) => {
 // ─── 404 catch-all ────────────────────────────────────────
 app.use((_req, res) => {
   res.status(404).json({ success: false, message: "Route not found" });
+});
+
+app.use((err: Error, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
+    if (err instanceof ResponseError) {
+        res.status(err.status).json({ success: false, message: err.message });
+    } else {
+        console.error(err);
+        res.status(500).json({ success: false, message: "Internal server error" });
+    }
 });
 
 app.listen(PORT, () => {
