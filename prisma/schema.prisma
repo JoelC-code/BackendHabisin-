@@ -9,9 +9,7 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  //! ignore error ini, hapus ngak bisa migrate
-  //! cuman warning ae, ngak ngerusak DB
+  provider = "postgresql" // WAJIB postgresql
   url      = env("DATABASE_URL")
 }
 
@@ -45,6 +43,7 @@ model Food {
   bestBefore DateTime
   quantity Int
   category FoodCategory
+  imageUrl String?
   user User @relation(fields: [user_id], references: [id], onDelete: Cascade)
 }
 

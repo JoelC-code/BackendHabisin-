@@ -10,6 +10,7 @@ const foodSchema = z.object({
 	bestBefore: z.string().datetime(),
 	quantity: z.number().int().positive(),
 	category: z.enum(["PRODUCE", "DIARY", "MEAT", "OTHER"]),
+	imageUrl: z.string().url().optional(),
 });
 
 export class FoodController {

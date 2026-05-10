@@ -7,6 +7,7 @@ export interface FoodCreateUpdateRequest {
     bestBefore: string;
     quantity: number;
     category: FoodCategory;
+    imageUrl?: string | null;
 }
 
 // ─── RESPONSE TYPE ────────────────────────────────────────
@@ -23,6 +24,7 @@ export function toFoodResponse(prismaFood: Food): FoodResponse {
         bestBefore: prismaFood.bestBefore.toISOString(),
         quantity: prismaFood.quantity,
         category: prismaFood.category,
+        imageUrl: prismaFood.imageUrl,
     };
 }
 
@@ -35,5 +37,6 @@ export function toFoodResponseList(prismaFoods: Food[]): FoodResponse[] {
         bestBefore: food.bestBefore.toISOString(),
         quantity: food.quantity,
         category: food.category,
+        imageUrl: food.imageUrl,
     }));
 }
