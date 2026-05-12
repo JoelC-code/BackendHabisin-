@@ -5,7 +5,7 @@ import { JWT_SECRET_KEY } from "./env-util"
 
 export const generateToken = (
     payload: UserJWTPayload,
-    expiryTime: StringValue = "1h"
+    expiryTime: StringValue = "24h"
 ): string => {
     return jwt.sign(payload, JWT_SECRET_KEY || "secret_key", {
         expiresIn: expiryTime,
