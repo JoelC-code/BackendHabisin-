@@ -47,6 +47,7 @@ export const foodService = {
                 bestBefore: new Date(data.bestBefore),
                 quantity: data.quantity,
                 category: data.category,
+                imageUrl: data.imageUrl || null,
             },
         });
 
