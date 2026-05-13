@@ -1,6 +1,7 @@
 {
   // Visit https://aka.ms/tsconfig to read more about this file
   "include": ["src/**/*", "test-prisma.ts"],
+  "files": ["src/types/midtrans-client.d.ts"],
   "compilerOptions": {
     // File Layout
     "rootDir": ".",
