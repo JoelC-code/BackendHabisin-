@@ -15,6 +15,9 @@ export const foodService = {
             where: {
                 user_id: user.id,
             },
+            orderBy: {
+                bestBefore: 'asc' 
+            }
         });
 
         return toFoodResponseList(foods);
