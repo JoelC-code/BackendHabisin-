@@ -9,7 +9,7 @@ export class PaymentController {
      */
     static async subscribe(req: UserRequest, res: Response, next: NextFunction) {
         try {
-            const userId = req.user!.id;
+            const userId = Number(req.user!.id);
             const result = await PaymentService.subscribe(userId);
 
             res.status(200).json({
