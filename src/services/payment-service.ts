@@ -1,5 +1,6 @@
 import { prismaClient } from "../utils/prisma";
 import { MidtransService } from "./midtrans-service";
+import { checkSubscription } from "../middleware/subscription-middleware";
 
 const PRICE = Number(process.env.SUBSCRIPTION_PRICE_IDR) || 15000;
 const DURATION_DAYS = Number(process.env.SUBSCRIPTION_DURATION_DAYS) || 30;
@@ -152,24 +153,36 @@ export const PaymentService = {
      * Cek status subscription user — apakah masih aktif?
      */
     async getStatus(userId: number): Promise<StatusResult> {
-        const activeSub = await prismaClient.subscription.findFirst({
-            where: {
-                userId,
-                status: "active",
-                endDate: { gt: new Date() },
-            },
-            orderBy: { endDate: "desc" },
-        });
+        try {
+            // PENTING: Pastikan userId diubah menjadi tipe Number agar sinkron dengan database Int
+            const parsedUserId = Number(userId);
 
-        return {
-            isActive: !!activeSub,
-            expiresAt: activeSub?.endDate ?? null,
-            daysRemaining: activeSub?.endDate
-                ? Math.ceil(
-                    (activeSub.endDate.getTime() - Date.now()) /
-                    (1000 * 60 * 60 * 24)
-                )
-                : 0,
-        };
+            const activeSub = await prismaClient.subscription.findFirst({
+                where: {
+                    userId: parsedUserId,
+                    status: "active",
+                    endDate: { gt: new Date() },
+                },
+                orderBy: { endDate: "desc" },
+            });
+
+            return {
+                isActive: !!activeSub,
+                expiresAt: activeSub?.endDate ?? null,
+                daysRemaining: activeSub?.endDate
+                    ? Math.ceil(
+                        (activeSub.endDate.getTime() - Date.now()) /
+                        (1000 * 60 * 60 * 24)
+                    )
+                    : 0,
+            };
+        } catch (error) {
+            console.error("Error inside PaymentService.getStatus:", error);
+            return {
+                isActive: false,
+                expiresAt: null,
+                daysRemaining: 0
+            };
+        }
     },
 };

@@ -49,7 +49,7 @@ export const foodService = {
                 descriptionFood: data.descriptionFood?.trim() || "",
                 bestBefore: new Date(data.bestBefore),
                 quantity: data.quantity,
-                category: data.category,
+                category: (data.category.toUpperCase()) as any,
                 imageUrl: data.imageUrl || null,
             },
         });
