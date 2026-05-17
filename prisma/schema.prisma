@@ -60,6 +60,7 @@ model Resep {
   id Int @id @default(autoincrement()) @map("card_id")
   resepName String @db.VarChar(100)
   resepDescription String @db.VarChar(255)
+  resepCategory    String   @db.VarChar(50)
   resepIngredients String[]
   resepDirections String[]
 

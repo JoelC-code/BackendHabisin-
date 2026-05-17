@@ -33,11 +33,16 @@ async function main() {
       password: hashedPassword,
       
       // ✅ Insert data ke tabel Subscription otomatis terhubung ke user ini
-      subscription: {
-        create: {
-          startDate: today,
-          endDate: nextYear,
-        }
+    subscription: {
+        create: [
+          {
+            orderId: "ORDER-SEED-001",
+            amount: 15000,
+            status: "active",
+            startDate: today,
+            endDate: nextYear,
+          }
+        ]
       },
       
       // ✅ Insert data ke tabel Food otomatis terhubung ke user ini
@@ -78,7 +83,7 @@ async function main() {
   console.log('Akun Testing:');
   console.log(`Email: ${user.email}`);
   console.log(`Password: password123`);
-  console.log(`Status Subscription: Aktif s/d ${user.subscription?.endDate.toDateString()}`);
+  console.log(`Status Subscription: Aktif s/d ${user.subscription[0]?.endDate?.toDateString() ?? 'Tidak ada'}`);
   console.log(`Jumlah Makanan: ${user.food.length} item siap diolah AI`);
 }
 

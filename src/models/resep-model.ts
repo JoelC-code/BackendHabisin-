@@ -2,12 +2,13 @@ import { Resep } from "../../generated/prisma/client";
 
 // ─── REQUEST DTO ──────────────────────────────────────────
 export interface ResepGenerateRequest {
-  saveToHistory?: boolean; // optional: simpan hasil ke tabel Resep
+  saveToHistory?: boolean;
 }
 
 export interface ResepCreateRequest {
   resepName: string;
   resepDescription: string;
+  resepCategory: string;
   resepIngredients: string[];
   resepDirections: string[];
 }
@@ -17,13 +18,14 @@ export interface ResepResponse {
   id: number;
   resepName: string;
   resepDescription: string;
+  resepCategory: string;
   resepIngredients: string[];
   resepDirections: string[];
 }
 
 export type ResepGenerateResponse = {
   success: boolean;
-  aiResponse: any; // ✅ Ubah dari string menjadi any atau objek
+  aiResponse: any;
   saved?: ResepResponse;
 }
 
@@ -33,6 +35,7 @@ export function toResepResponse(prismaResep: Resep): ResepResponse {
     id: prismaResep.id,
     resepName: prismaResep.resepName,
     resepDescription: prismaResep.resepDescription,
+    resepCategory: prismaResep.resepCategory,
     resepIngredients: prismaResep.resepIngredients,
     resepDirections: prismaResep.resepDirections,
   };

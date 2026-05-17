@@ -2,7 +2,7 @@ import { Router } from "express";
 import { PaymentController } from "../controllers/payment-controller";
 import { authenticate } from "../middleware/auth";
 
-console.log("✅ payment-routes.ts loaded");
+// console.log("✅ payment-routes.ts loaded");
 
 const router = Router();
 
