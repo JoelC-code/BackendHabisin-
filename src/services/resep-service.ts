@@ -35,7 +35,7 @@ export const generateResep = async (
 	const { aiResponse, parsed } = await generateRecipeFromAI(foodList);
 
 	let saved: ResepResponse | undefined;
-	if (saveToHistory) {
+	//if (saveToHistory) {
 		const created = await prismaClient.resep.create({
 			data: {
 				resepName: parsed.resepName,
@@ -47,7 +47,7 @@ export const generateResep = async (
 			},
 		});
 		saved = toResepResponse(created);
-	}
+	//}
 
 	return { success: true, aiResponse: parsed, saved };
 };
