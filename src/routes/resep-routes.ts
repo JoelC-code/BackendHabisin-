@@ -7,8 +7,8 @@ import { checkSubscription } from "../middleware/subscription-middleware";
 const router = Router();
 
 // Semua route resep dilindungi oleh 2 gembok: Login & Subscribe
-router.use(authenticate, checkSubscription);
-
+router.use(authenticate);
+router.use(checkSubscription);
 router.post("/generate", ResepController.generate);
 router.get("/all", ResepController.getAll);
 router.get("/:id", ResepController.getById);
