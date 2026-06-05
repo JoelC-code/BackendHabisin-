@@ -25,6 +25,9 @@ export const paginated = (
   });
 
 
+export const badRequest = (res: Response, message = "Bad request", errors?: unknown) =>
+  res.status(400).json({ success: false, message, ...(errors ? { errors } : {}) });
+
 export const unauthorized = (res: Response, message = "Unauthorized") =>
   res.status(401).json({ success: false, message });
 

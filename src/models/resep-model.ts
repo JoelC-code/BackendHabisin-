@@ -13,6 +13,9 @@ export interface ResepCreateRequest {
   resepDirections: string[];
 }
 
+// Input untuk service createResep (hasil validasi zod).
+export type ResepCreateInput = ResepCreateRequest;
+
 // ─── RESPONSE TYPE ────────────────────────────────────────
 export interface ResepResponse {
   id: number;
@@ -27,6 +30,7 @@ export type ResepGenerateResponse = {
   success: boolean;
   aiResponse: any;
   saved?: ResepResponse;
+  quota?: { used: number; limit: number };
 }
 
 // ─── MAPPER ───────────────────────────────────────────────

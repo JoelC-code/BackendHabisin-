@@ -7,4 +7,5 @@ node_modules
 /generated/prisma
 .DS_Store
 /uploads
+/public/uploads
 .vscode

@@ -2,7 +2,7 @@ import { prismaClient } from "../utils/prisma";
 import { UserJWTPayload } from "../models/user-model";
 
 import {
-    FoodCreateUpdateRequest,
+    FoodCreateInput,
     FoodResponse,
     toFoodResponse,
     toFoodResponseList,
@@ -39,7 +39,7 @@ export const foodService = {
 
     // ─── CREATE ────────────────────────────────────────────
     async create(
-        data: FoodCreateUpdateRequest,
+        data: FoodCreateInput,
         userId: number
     ): Promise<FoodResponse> {
         const food = await prismaClient.food.create({

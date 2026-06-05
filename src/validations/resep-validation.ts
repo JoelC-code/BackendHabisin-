@@ -3,6 +3,8 @@ import { z } from "zod";
 // ─── GENERATE RESEP VALIDATION ────────────────────────────
 export const ResepGenerateSchema = z.object({
   saveToHistory: z.boolean().optional().default(false),
+  // Preferensi kategori/cuisine opsional (mis. "Camilan & Jajanan Pasar").
+  category: z.string().max(50).optional(),
 });
 
 // ─── MANUAL CREATE RESEP VALIDATION ──────────────────────
@@ -16,6 +18,11 @@ export const ResepCreateSchema = z.object({
     .string()
     .min(10, "Deskripsi resep minimal 10 karakter")
     .max(255, "Deskripsi resep maksimal 255 karakter"),
+
+  resepCategory: z
+    .string()
+    .min(1, "Kategori resep tidak boleh kosong")
+    .max(50, "Kategori resep maksimal 50 karakter"),
 
   resepIngredients: z
     .array(z.string().min(1, "Ingredient tidak boleh kosong"))

@@ -6,6 +6,8 @@ import categoryRoutes   from "./routes/category-routes";
 import foodRoutes       from "./routes/food-routes";
 import DashboardRoutes  from "./routes/dashboard-routes";
 import resepRoutes      from "./routes/resep-routes";
+import catalogRoutes    from "./routes/catalog-routes";
+import notificationRoutes from "./routes/notification-routes";
 import { ResponseError } from "./errors/response-error";
 import paymentRoutes from "./routes/payment-routes";
 
@@ -16,12 +18,18 @@ const PORT = process.env.PORT ?? 3000;
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// Serve foto produk yang di-upload (multer simpan di public/uploads).
+// imageUrl yang disimpan di DB berbentuk /uploads/<filename>.
+app.use("/uploads", express.static("public/uploads"));
+
 // ─── Routes ──────────────────────────────────────────────
 app.use("/api/auth",        authRoutes);
 app.use("/api/categories",  categoryRoutes);
 app.use("/api/foods",       foodRoutes);
 app.use("/api/dashboard",   DashboardRoutes);
 app.use("/api/resep",       resepRoutes);
+app.use("/api/catalog",     catalogRoutes);
+app.use("/api/notifications", notificationRoutes);
 app.use("/api/payment",     paymentRoutes);
 
 // ─── Health check ─────────────────────────────────────────

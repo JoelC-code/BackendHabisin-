@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import { PaymentService } from "../services/payment-service";
+import { PAYMENTS_ENABLED } from "../utils/env-util";
 
 export const checkSubscription = async (
     req: Request & { user?: { id: number } },
@@ -7,6 +8,12 @@ export const checkSubscription = async (
     next: NextFunction
 ): Promise<void> => {
     try {
+        // Mode demo: pembayaran dimatikan → lewati gate sepenuhnya.
+        if (!PAYMENTS_ENABLED) {
+            next();
+            return;
+        }
+
         const userId = req.user?.id;
 
         if (!userId) {

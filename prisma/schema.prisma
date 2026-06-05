@@ -24,6 +24,8 @@ model User {
   food Food[]
 
   resep Resep[]
+
+  generationLog GenerationLog[]
 }
 
 model Subscription {
@@ -68,9 +70,38 @@ model Resep {
   user User @relation(fields: [user_id], references: [id], onDelete: Cascade)
 }
 
+// Katalog resep kurasi (resep Indonesia siap-jelajah, bukan AI per-user).
+// isPremium=true → cuma bisa dibuka subscriber (PRO). Free bisa lihat di list
+// tapi detailnya terkunci.
+model CatalogRecipe {
+  id          Int      @id @default(autoincrement())
+  name        String   @db.VarChar(100)
+  description String   @db.VarChar(500)
+  category    String   @db.VarChar(50)
+  ingredients String[]
+  directions  String[]
+  imageUrl    String?
+  isPremium   Boolean  @default(false)
+  createdAt   DateTime @default(now())
+
+  @@index([category])
+}
+
+// Mencatat tiap kali user generate resep via AI — dipakai untuk
+// menghitung kuota harian (cost-control Gemini).
+model GenerationLog {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+}
+
 enum FoodCategory {
   PRODUCE
-  DIARY
+  DAIRY
   MEAT
   OTHER
 }

@@ -1,12 +1,21 @@
 // controllers/resep-controller.ts
-import { Request, Response } from "express";
-import { ResepGenerateSchema } from "../validations/resep-validation";
-import { generateResep, getAllResep, getResepById, deleteResep } from "../services/resep-service";
+import { Response } from "express";
+import { UserRequest } from "../models/user-request-model";
+import { ResepCreateSchema, ResepGenerateSchema } from "../validations/resep-validation";
+import {
+  generateResep,
+  createResep,
+  getAllResep,
+  getResepById,
+  deleteResep,
+  QuotaExceededError,
+} from "../services/resep-service";
 
 export class ResepController {
- static async generate(req: Request, res: Response): Promise<void> {
+  // POST /api/resep/generate — preview resep dari bahan di kulkas (AI)
+  static async generate(req: UserRequest, res: Response): Promise<void> {
     try {
-      const parsed = ResepGenerateSchema.safeParse(req.body);
+      const parsed = ResepGenerateSchema.safeParse(req.body ?? {});
       if (!parsed.success) {
         res.status(400).json({
           success: false,
@@ -15,19 +24,17 @@ export class ResepController {
         return;
       }
 
-      // ✅ AMBIL DARI req.user (hasil dari middleware authenticate)
-      // Gunakan (req as any).user.id atau sesuaikan dengan tipe Express Request kamu
-      const userId = Number((req as any).user.id); 
-      
-      const { saveToHistory } = parsed.data;
+      const userId = req.user!.id;
+      const { saveToHistory, category } = parsed.data;
 
-      const result = await generateResep(userId, saveToHistory);
+      const result = await generateResep(userId, saveToHistory, category);
       res.status(200).json(result);
     } catch (error: any) {
-      const isClientError =
-        error.message.includes("Tidak ada bahan") ||
-        error.message.includes("rate limit");
-
+      if (error instanceof QuotaExceededError) {
+        res.status(429).json({ success: false, message: error.message });
+        return;
+      }
+      const isClientError = error.message?.includes("Tidak ada bahan");
       res.status(isClientError ? 400 : 500).json({
         success: false,
         message: error.message,
@@ -35,29 +42,49 @@ export class ResepController {
     }
   }
 
-  // GET /api/resep/all
-  static async getAll(req: Request, res: Response): Promise<void> {
+  // POST /api/resep — simpan resep (hasil generate yang di-"Save" / resep manual)
+  static async create(req: UserRequest, res: Response): Promise<void> {
     try {
-      const userId = Number((req as any).user.id); // ✅ Ambil userId dari token
-      const reseps = await getAllResep(userId);    // ✅ Kirim ke service
+      const parsed = ResepCreateSchema.safeParse(req.body);
+      if (!parsed.success) {
+        res.status(400).json({
+          success: false,
+          errors: parsed.error.flatten().fieldErrors,
+        });
+        return;
+      }
+
+      const userId = req.user!.id;
+      const resep = await createResep(userId, parsed.data);
+      res.status(201).json({ success: true, data: resep });
+    } catch (error: any) {
+      res.status(500).json({ success: false, message: error.message });
+    }
+  }
+
+  // GET /api/resep/all — daftar resep milik user
+  static async getAll(req: UserRequest, res: Response): Promise<void> {
+    try {
+      const userId = req.user!.id;
+      const reseps = await getAllResep(userId);
       res.status(200).json({ success: true, data: reseps });
     } catch (error: any) {
       res.status(500).json({ success: false, message: error.message });
     }
   }
 
-  // GET /api/resep/:id
-  static async getById(req: Request, res: Response): Promise<void> {
+  // GET /api/resep/:id — detail resep milik user
+  static async getById(req: UserRequest, res: Response): Promise<void> {
     try {
-      const userId = Number((req as any).user.id); // ✅ Ambil userId
+      const userId = req.user!.id;
       const id = Number(req.params.id);
-      
+
       if (isNaN(id)) {
         res.status(400).json({ success: false, message: "ID tidak valid" });
         return;
       }
 
-      const resep = await getResepById(userId, id); // ✅ Kirim userId & id
+      const resep = await getResepById(userId, id);
       res.status(200).json({ success: true, data: resep });
     } catch (error: any) {
       res.status(error.message.includes("tidak ditemukan") ? 404 : 500).json({
@@ -68,17 +95,17 @@ export class ResepController {
   }
 
   // DELETE /api/resep/remove/:id
-  static async remove(req: Request, res: Response): Promise<void> {
+  static async remove(req: UserRequest, res: Response): Promise<void> {
     try {
-      const userId = Number((req as any).user.id); // ✅ Ambil userId
+      const userId = req.user!.id;
       const id = Number(req.params.id);
-      
+
       if (isNaN(id)) {
         res.status(400).json({ success: false, message: "ID tidak valid" });
         return;
       }
 
-      await deleteResep(userId, id); // ✅ Kirim userId & id
+      await deleteResep(userId, id);
       res.status(200).json({ success: true, message: "Resep berhasil dihapus" });
     } catch (error: any) {
       res.status(error.message.includes("tidak ditemukan") ? 404 : 500).json({

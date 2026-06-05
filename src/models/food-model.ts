@@ -10,6 +10,17 @@ export interface FoodCreateUpdateRequest {
     imageUrl?: string | null;
 }
 
+// Input untuk service create — tanggal bisa Date (hasil z.coerce.date) atau
+// string, kategori sebagai string biasa (sudah di-uppercase di controller).
+export interface FoodCreateInput {
+    foodName: string;
+    descriptionFood?: string;
+    bestBefore: Date | string;
+    quantity: number;
+    category: string;
+    imageUrl?: string | null;
+}
+
 // ─── RESPONSE TYPE ────────────────────────────────────────
 export interface FoodResponse extends FoodCreateUpdateRequest {
     id: number;

@@ -1,6 +1,6 @@
 import { prismaClient } from "../utils/prisma";
 import { MidtransService } from "./midtrans-service";
-import { checkSubscription } from "../middleware/subscription-middleware";
+import { PAYMENTS_ENABLED } from "../utils/env-util";
 
 const PRICE = Number(process.env.SUBSCRIPTION_PRICE_IDR) || 15000;
 const DURATION_DAYS = Number(process.env.SUBSCRIPTION_DURATION_DAYS) || 30;
@@ -25,6 +25,12 @@ export const PaymentService = {
      * Return snapToken untuk dipake Android SDK.
      */
     async subscribe(userId: number): Promise<SubscribeResult> {
+        if (!PAYMENTS_ENABLED) {
+            throw new Error(
+                "Pembayaran sedang dinonaktifkan (mode demo). Semua fitur sudah terbuka tanpa berlangganan."
+            );
+        }
+
         const user = await prismaClient.user.findUnique({ where: { id: userId } });
         if (!user) {
             throw new Error("User not found");
@@ -184,5 +190,16 @@ export const PaymentService = {
                 daysRemaining: 0
             };
         }
+    },
+
+    /**
+     * Tentukan tier user untuk keperluan kuota/perks.
+     * Kalau PAYMENTS_ENABLED=false (mode demo), semua user dianggap "pro"
+     * supaya bisa dipakai penuh tanpa Midtrans.
+     */
+    async getUserTier(userId: number): Promise<"free" | "pro"> {
+        if (!PAYMENTS_ENABLED) return "pro";
+        const status = await this.getStatus(userId);
+        return status.isActive ? "pro" : "free";
     },
 };

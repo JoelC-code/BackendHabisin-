@@ -1,14 +1,13 @@
 import { UserJWTPayload } from "../models/user-model";
 import { prismaClient } from "../utils/prisma";
-
-const Expiry_Threshhold = 2
+import { EXPIRY_THRESHOLD_DAYS } from "../utils/env-util";
 
 export class DashboardService {
     static async getDashboard(user: UserJWTPayload) {
         const now = new Date()
 
         const thresholdDate = new Date()
-        thresholdDate.setDate(now.getDate() + Expiry_Threshhold)
+        thresholdDate.setDate(now.getDate() + EXPIRY_THRESHOLD_DAYS)
 
         const expiringFoods = await prismaClient.food.findMany({
             where: {

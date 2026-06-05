@@ -1,6 +1,7 @@
 // prisma/seed.ts
 import { PrismaClient } from '../generated/prisma/client'; // Sesuaikan path ini dengan output generatormu
 import bcrypt from 'bcrypt'; // Asumsi kamu menggunakan bcrypt untuk hashing password di controller auth
+import { catalogRecipes } from './catalog-data';
 
 const prisma = new PrismaClient();
 
@@ -9,10 +10,16 @@ async function main() {
 
   // 1. (Opsional) Bersihkan data lama agar tidak bentrok / error unique constraint
   // Hati-hati, ini akan menghapus isi tabelmu saat ini!
+  await prisma.generationLog.deleteMany();
   await prisma.resep.deleteMany();
   await prisma.food.deleteMany();
   await prisma.subscription.deleteMany();
   await prisma.user.deleteMany();
+  await prisma.catalogRecipe.deleteMany();
+
+  // 1b. Seed katalog resep Indonesia (autentik)
+  await prisma.catalogRecipe.createMany({ data: catalogRecipes });
+  console.log(`Katalog resep di-seed: ${catalogRecipes.length} resep.`);
 
   // 2. Hash password (agar bisa dipakai login beneran di Postman)
   const hashedPassword = await bcrypt.hash("password123", 10);
@@ -68,6 +75,13 @@ async function main() {
             quantity: 2,
             bestBefore: nextMonth,
             category: "MEAT",
+          },
+          {
+            foodName: "Susu UHT",
+            descriptionFood: "Susu full cream 1 liter",
+            quantity: 1,
+            bestBefore: nextMonth,
+            category: "DAIRY",
           }
         ]
       }
