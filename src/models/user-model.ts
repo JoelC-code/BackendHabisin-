@@ -34,7 +34,7 @@ export function toUserResponse(
                 username: username,
                 email: email,
             },
-            "1h"
+            "7d"
         ),
     }
 }

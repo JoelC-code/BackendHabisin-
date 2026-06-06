@@ -2,7 +2,15 @@ import dotenv from "dotenv"
 
 dotenv.config()
 
-export const JWT_SECRET_KEY = process.env.JWT_SECRET_KEY
+// Wajib ada — tanpa secret yang konsisten, token nggak portable antar restart/
+// instance. Fail-fast biar ketauan langsung pas start, bukan diam-diam pakai
+// fallback yang bikin token lama invalid.
+if (!process.env.JWT_SECRET_KEY) {
+    throw new Error(
+        "JWT_SECRET_KEY belum di-set di .env. Tambahkan JWT_SECRET_KEY=<string acak panjang> sebelum menjalankan server."
+    )
+}
+export const JWT_SECRET_KEY: string = process.env.JWT_SECRET_KEY
 export const PORT = process.env.PORT
 
 // ─── Monetisasi / pembayaran ──────────────────────────────

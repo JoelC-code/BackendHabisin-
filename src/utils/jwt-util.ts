@@ -7,11 +7,11 @@ export const generateToken = (
     payload: UserJWTPayload,
     expiryTime: StringValue = "24h"
 ): string => {
-    return jwt.sign(payload, JWT_SECRET_KEY || "secret_key", {
+    return jwt.sign(payload, JWT_SECRET_KEY, {
         expiresIn: expiryTime,
     })
 }
 
 export const verifyToken = (token: string): UserJWTPayload => {
-    return jwt.verify(token, JWT_SECRET_KEY || "secret_key") as UserJWTPayload
+    return jwt.verify(token, JWT_SECRET_KEY) as UserJWTPayload
 }
