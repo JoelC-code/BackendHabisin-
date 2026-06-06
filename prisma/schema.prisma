@@ -31,10 +31,11 @@ model User {
 model Subscription {
   id          Int       @id @default(autoincrement())
   userId      Int                                  
-  orderId     String    @unique                    
-  amount      Int                                  
-  status      String                              
-  paymentType String?                             
+  orderId     String    @unique
+  amount      Int
+  plan        String    @default("monthly")
+  status      String
+  paymentType String?
   startDate   DateTime?                            
   endDate     DateTime?                         
   createdAt   DateTime  @default(now())        

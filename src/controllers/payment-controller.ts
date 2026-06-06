@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import { UserRequest } from "../models/user-request-model";
-import { PaymentService } from "../services/payment-service";
+import { PaymentService, isPlan } from "../services/payment-service";
 
 export class PaymentController {
     /**
@@ -10,7 +10,10 @@ export class PaymentController {
     static async subscribe(req: UserRequest, res: Response, next: NextFunction) {
         try {
             const userId = Number(req.user!.id);
-            const result = await PaymentService.subscribe(userId);
+            // plan opsional di body: "monthly" (default) atau "yearly"
+            const planRaw = String(req.body?.plan ?? "monthly").toLowerCase();
+            const plan = isPlan(planRaw) ? planRaw : "monthly";
+            const result = await PaymentService.subscribe(userId, plan);
 
             res.status(200).json({
                 success: true,

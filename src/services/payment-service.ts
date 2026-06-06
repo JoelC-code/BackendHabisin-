@@ -1,15 +1,33 @@
 import { prismaClient } from "../utils/prisma";
 import { MidtransService } from "./midtrans-service";
 import { PAYMENTS_ENABLED } from "../utils/env-util";
+import { ResponseError } from "../errors/response-error";
 
-const PRICE = Number(process.env.SUBSCRIPTION_PRICE_IDR) || 15000;
-const DURATION_DAYS = Number(process.env.SUBSCRIPTION_DURATION_DAYS) || 30;
+export type PlanId = "monthly" | "yearly";
+
+// Dua plan langganan. Harga & durasi env-configurable.
+// Monthly Rp15.000/30 hari, Yearly Rp180.000/365 hari (tanpa diskon).
+const PLANS: Record<PlanId, { amount: number; days: number; label: string }> = {
+    monthly: {
+        amount: Number(process.env.SUBSCRIPTION_PRICE_IDR) || 15000,
+        days: Number(process.env.SUBSCRIPTION_DURATION_DAYS) || 30,
+        label: "1 Bulan",
+    },
+    yearly: {
+        amount: Number(process.env.YEARLY_PRICE_IDR) || 180000,
+        days: Number(process.env.YEARLY_DURATION_DAYS) || 365,
+        label: "1 Tahun",
+    },
+};
+
+export const isPlan = (p: string): p is PlanId => p === "monthly" || p === "yearly";
 
 export interface SubscribeResult {
     orderId: string;
     snapToken: string;
     redirectUrl: string;
     amount: number;
+    plan: PlanId;
     currentExpiresAt: Date | null;
 }
 
@@ -24,12 +42,15 @@ export const PaymentService = {
      * Bikin transaksi Midtrans + simpan subscription "pending" ke DB.
      * Return snapToken untuk dipake Android SDK.
      */
-    async subscribe(userId: number): Promise<SubscribeResult> {
+    async subscribe(userId: number, plan: PlanId = "monthly"): Promise<SubscribeResult> {
         if (!PAYMENTS_ENABLED) {
-            throw new Error(
+            throw new ResponseError(
+                403,
                 "Pembayaran sedang dinonaktifkan (mode demo). Semua fitur sudah terbuka tanpa berlangganan."
             );
         }
+
+        const cfg = PLANS[plan];
 
         const user = await prismaClient.user.findUnique({ where: { id: userId } });
         if (!user) {
@@ -46,15 +67,16 @@ export const PaymentService = {
             orderBy: { endDate: "desc" },
         });
 
-        // Generate order ID unik
-        const orderId = `SUB-${userId}-${Date.now()}`;
+        // Generate order ID unik (plan ikut biar gampang dibaca)
+        const orderId = `SUB-${plan.toUpperCase()}-${userId}-${Date.now()}`;
 
         // Bikin record subscription dengan status "pending"
         await prismaClient.subscription.create({
             data: {
                 userId,
                 orderId,
-                amount: PRICE,
+                amount: cfg.amount,
+                plan,
                 status: "pending",
             },
         });
@@ -62,16 +84,18 @@ export const PaymentService = {
         // Request snap token dari Midtrans
         const { token, redirectUrl } = await MidtransService.createSnapTransaction({
             orderId,
-            amount: PRICE,
+            amount: cfg.amount,
             userEmail: user.email,
             userName: user.username || "Habisin User",
+            itemName: `Habisin Subscription (${cfg.label})`,
         });
 
         return {
             orderId,
             snapToken: token,
             redirectUrl,
-            amount: PRICE,
+            amount: cfg.amount,
+            plan,
             currentExpiresAt: activeSub?.endDate ?? null,
         };
     },
@@ -130,9 +154,12 @@ export const PaymentService = {
             });
 
             const baseDate = existingActive?.endDate ?? new Date();
+            const durationDays = isPlan(sub.plan)
+                ? PLANS[sub.plan].days
+                : PLANS.monthly.days;
             startDate = new Date();
             endDate = new Date(
-                baseDate.getTime() + DURATION_DAYS * 24 * 60 * 60 * 1000
+                baseDate.getTime() + durationDays * 24 * 60 * 60 * 1000
             );
         } else if (
             transactionStatus === "cancel" ||

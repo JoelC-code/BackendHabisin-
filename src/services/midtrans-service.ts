@@ -12,6 +12,7 @@ export interface CreateSnapParams {
   amount: number;
   userEmail: string;
   userName: string;
+  itemName?: string;
 }
 
 export const MidtransService = {
@@ -33,10 +34,10 @@ export const MidtransService = {
       },
       item_details: [
         {
-          id: "SUB_MONTHLY",
+          id: "SUB",
           price: params.amount,
           quantity: 1,
-          name: "Habisin Subscription (1 Bulan)",
+          name: params.itemName ?? "Habisin Subscription",
         },
       ],
       credit_card: {
