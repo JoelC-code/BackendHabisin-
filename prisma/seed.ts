@@ -93,12 +93,50 @@ async function main() {
     }
   });
 
+  // 5. Akun test eksplisit buat FE — FREE (tanpa langganan) & PRO (langganan aktif).
+  //    Berguna untuk tes layar Subscription & gate katalog premium saat
+  //    PAYMENTS_ENABLED=true. (Saat false, semua user otomatis PRO.)
+  await prisma.user.create({
+    data: {
+      username: "Free Tester",
+      email: "free@habisin.test",
+      password: hashedPassword,
+      food: {
+        create: [
+          { foodName: "Telur Ayam", descriptionFood: "Telur segar", quantity: 6, bestBefore: nextMonth, category: "OTHER" },
+          { foodName: "Wortel", descriptionFood: "Sayur segar", quantity: 5, bestBefore: nextMonth, category: "PRODUCE" },
+        ],
+      },
+    },
+  });
+
+  await prisma.user.create({
+    data: {
+      username: "Pro Tester",
+      email: "pro@habisin.test",
+      password: hashedPassword,
+      subscription: {
+        create: [
+          {
+            orderId: "ORDER-SEED-PRO",
+            amount: 15000,
+            plan: "monthly",
+            status: "active",
+            startDate: today,
+            endDate: nextYear,
+          },
+        ],
+      },
+    },
+  });
+
   console.log('Seeding Selesai! 🎉');
   console.log('Akun Testing:');
-  console.log(`Email: ${user.email}`);
-  console.log(`Password: password123`);
-  console.log(`Status Subscription: Aktif s/d ${user.subscription[0]?.endDate?.toDateString() ?? 'Tidak ada'}`);
-  console.log(`Jumlah Makanan: ${user.food.length} item siap diolah AI`);
+  console.log(`  PRO  (seed lama): ${user.email} / password123`);
+  console.log(`  FREE (test FE)  : free@habisin.test / password123  (tanpa langganan)`);
+  console.log(`  PRO  (test FE)  : pro@habisin.test / password123   (langganan aktif)`);
+  console.log(`Catatan: status FREE/PRO baru terasa saat PAYMENTS_ENABLED=true.`);
+  console.log(`Jumlah Makanan akun utama: ${user.food.length} item siap diolah AI`);
 }
 
 main()
