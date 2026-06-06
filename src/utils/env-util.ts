@@ -31,4 +31,4 @@ export const EXPIRY_THRESHOLD_DAYS =
     Number(process.env.EXPIRY_THRESHOLD_DAYS) || 3
 
 // ─── AI ───────────────────────────────────────────────────
-export const GEMINI_MODEL = process.env.GEMINI_MODEL || "gemini-2.5-flash-lite"
+export const GEMINI_MODEL = process.env.GEMINI_MODEL || "gemini-3.1-flash-lite"

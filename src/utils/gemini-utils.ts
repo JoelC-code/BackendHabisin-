@@ -93,7 +93,10 @@ ${foodList}
 			generationConfig: {
 				responseMimeType: "application/json",
 				responseSchema: recipeSchema,
-			},
+				maxOutputTokens: 900,
+				// Matiin "thinking" — buat 1 resep gak perlu reasoning, ini mangkas latency.
+				thinkingConfig: { thinkingBudget: 0 },
+			} as any,
 		});
 
 		aiResponse = result.response.text();
