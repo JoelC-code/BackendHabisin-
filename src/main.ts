@@ -9,6 +9,7 @@ import resepRoutes      from "./routes/resep-routes";
 import catalogRoutes    from "./routes/catalog-routes";
 import notificationRoutes from "./routes/notification-routes";
 import { ResponseError } from "./errors/response-error";
+import { ZodError } from "zod";
 import paymentRoutes from "./routes/payment-routes";
 
 const app  = express();
@@ -45,6 +46,13 @@ app.use((_req, res) => {
 app.use((err: Error, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
     if (err instanceof ResponseError) {
         res.status(err.status).json({ success: false, message: err.message });
+    } else if (err instanceof ZodError) {
+        // Validasi gagal (mis. dari auth register/login yang pakai schema.parse)
+        res.status(400).json({
+            success: false,
+            message: "Validation error",
+            errors: err.flatten().fieldErrors,
+        });
     } else {
         console.error(err);
         res.status(500).json({ success: false, message: "Internal server error" });
